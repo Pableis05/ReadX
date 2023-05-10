@@ -1,6 +1,7 @@
 package model;
 
 import java.util.Calendar;
+import java.util.Random;
 
 public class Book extends BibliographicProduct{
     private String review;
@@ -18,12 +19,27 @@ public class Book extends BibliographicProduct{
         }
     }
 
+    
+
     public void setReview(String review) {
         this.review = review;
     }
 
     public void setGender(GenderType gender) {
         this.gender = gender;
+    }
+
+    
+
+    @Override
+    public String createID() {
+        Random random = new Random();
+        int randomNumber = random.nextInt();
+        String hexCode = Integer.toHexString(randomNumber);
+        while(hexCode.length() > 0){
+            hexCode = "0" +hexCode;
+        }
+        return hexCode;
     }
 
     

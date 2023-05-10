@@ -18,10 +18,25 @@ public abstract class BibliographicProduct {
         this.numberPages = numberPages;
         this.publicationDate = publicationDate;
         this.url = url;
+        this.idProduct = createID();
         this.valueProduct = valueProduct;
         amountSales = 0;
         amountPagesRead = 0;
+    }
 
+    public abstract String createID();
+
+    public void addNumberPagesRead(int newPages){
+        this.amountPagesRead += newPages;
+        
+    }
+
+    public void addAmountSales(){
+        this.amountSales++;
+    }
+
+    public void decreaseAmountSales(){
+        this.amountSales--;
     }
 
     public String getIdProduct() {
@@ -46,6 +61,26 @@ public abstract class BibliographicProduct {
 
     public void setValueProduct(double valueProduct) {
         this.valueProduct = valueProduct;
+    }
+
+    public String getNameProduct() {
+        return nameProduct;
+    }
+
+    public int getNumberPages() {
+        return numberPages;
+    }
+
+    public double getValueProduct() {
+        return valueProduct;
+    }
+
+    public int getAmountSales() {
+        return amountSales;
+    }
+
+    public int getAmountPagesRead() {
+        return amountPagesRead;
     }
 
     

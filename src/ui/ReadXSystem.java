@@ -3,9 +3,7 @@ import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Scanner;
 
-import javax.sound.sampled.SourceDataLine;
-
-import model.Book;
+import model.BibliographicProduct;
 import model.ControllerLibrary;
 
 
@@ -79,10 +77,13 @@ public class ReadXSystem {
     public void manageBibliographicProducts() throws ParseException{
 
         System.out.println("Type your option: \n1. add bibliographic product \n2. modify bibliographic product \n3. delete bibliographic product");
-        if(input.hasNext("1")){
+        String optionManage = input.next();
+        if(optionManage.equals("1")){
             System.out.println("Enter the product name");
+            input.nextLine();
             String name = input.next();
             System.out.println("Enter the pages number");
+            input.nextLine();
             int numberPages = input.nextInt();
             System.out.println("Enter the publication day");
             String auxiliarDate = input.next();
@@ -92,37 +93,56 @@ public class ReadXSystem {
             System.out.println("Type the value of the product $");
             double valueProduct = input.nextDouble();
             System.out.println("Type 1 for a book or 2 for a magazine:");
-            if(input.hasNext("1")){
+            String typeProduct = input.next();
+            if(typeProduct.equals("1")){
                 System.out.println("Type a short review:");
+                input.nextLine();
                 String review = input.nextLine(); 
                 System.out.println("Enter the product gender: 1. Science fiction, 2. Fantasy, 3. Historical novel");
                 int gender = input.nextInt();
                 System.out.println(controller.addBook(name, numberPages, publicationDate, url, valueProduct, review, gender));
             }else{
                 System.out.println("Type the periodicity:");
+                input.nextLine();
                 String periodicity = input.nextLine();
                 System.out.println("Enter the product category: 1. Variety, 2. Design, 3. Scientist");
                 int category = input.nextInt();
                 System.out.println(controller.addMagazine(name, numberPages, publicationDate, url, valueProduct, periodicity, category));
             }
 
-        }else if(input.hasNext("2")){
+        }else if(optionManage.equals("2")){
             System.out.println("Type the id of the product");
             String id = input.next();
             int option = -1;
-            if(controller.getBibliographicProducts().get(controller.searchBibliograpicProduct(id)) instanceof Book){
+            if(controller.checkTypeBibliographicProduct(id)){
                 do{ 
                     System.out.println("Type the attribute to edit: 1. name, 2. numberPages, 3. publicationDate, 4. url, 5. valueProduct, 6. review, 7. gender, 0. Exit");
                     option = input.nextInt();
                     System.out.println("Enter the content of the change:");
+                    input.nextLine();
                     String change = input.nextLine();
                     System.out.println(controller.editBook(id, option, change));
                 }while(option != 0);
             }
+            else{
+                do{ 
+                    System.out.println("Type the attribute to edit: 1. name, 2. numberPages, 3. publicationDate, 4. url, 5. valueProduct, 6. periodicity, 7. category, 0. Exit");
+                    option = input.nextInt();
+                    if(option != 0 ){
+                        System.out.println("Enter the content of the change:");
+                        input.nextLine();
+                        String change = input.nextLine();
+                        System.out.println(controller.editMagazine(id, option, change));
+                    }
+                 
+                }while(option != 0); 
+            }
             
         }
-        else if(input.hasNext("3")){
-
+        else if(optionManage.equals("3")){
+            System.out.println("Type the id of the product");
+            String id = input.next();
+            System.out.println(controller.removeProducts(id));
         }
         else{
             System.out.println("invalid number");
@@ -131,28 +151,95 @@ public class ReadXSystem {
     }
 
     public void generateAutomaticObjects(){
-        
+        System.out.println(controller.initBasicObjects());
     }
 
     public void consultBibliographicProducts(){
-        
+        System.out.println("Enter the product name");
+        input.nextLine();
+        String searchName = input.nextLine();
+        System.out.println(controller.consultCodeBibliographicProducts(searchName));
     }
 
     public void readerBuyBook(){
-        
+        System.out.println("Type the user id:");
+        String idReader = input.next();
+        System.out.println("Type the book id:");
+        String idBook = input.next();
+        System.out.println(controller.aggregateBookToReader(idReader, idBook));
     }
 
     public void readerSubscribeMagazine(){
-        
+        System.out.println("Type the user id:");
+        String idReader = input.next();
+        System.out.println("Type the magazine id to suscribe:");
+        String idMagazine = input.next();
+        System.out.println(controller.aggregateMagazineToReader(idReader, idMagazine));
     }
 
     public void cancelSubscriptionMagazineOfReader(){
-        
+        System.out.println("Type the user id:");
+        String idReader = input.next();
+        System.out.println("Type the magazine id to desuscribe:");
+        String idMagazine = input.next();
+        System.out.println(controller.cancelMagazineOfReader(idReader, idMagazine));    
     }
 
     public void presentLibraryReader(){
+        String libraryOption = "";
         
-    }
+        do{
+            System.out.println("Type A to do a simultation, E to exit");
+            libraryOption = input.next();
+            if (libraryOption.equals("A")) {
+                System.out.println("Type the id reader");
+                String idReader = input.next();
+                System.out.println("Type the id product");
+                String idProduct = input.next();
+                String simulationOption = "";
+                int pagesRead = 0;
+                int maxPage = 0;
+                BibliographicProduct product = controller.consultObjectProduct(idProduct);
 
+                if(controller.checkUserHaveAProduct(idReader, idProduct)){ 
+                    do {
+                        System.out.println("Reader sesion in progress \n Reading: " +  product.getNameProduct() + "\n Reading page: " + pagesRead + " of "+ product.getNumberPages()
+                        +"\n Type A for the previous page \n Type S for the next page\n Type B to back to the library");
+                        
+                        simulationOption = input.next();
+        
+                        if(simulationOption.equals("S")){
+                            if(pagesRead == controller.consultObjectProduct(idProduct).getNumberPages()){
+                                System.out.print("\nThe book is on the last page");
+                            }
+                            else{
+                                pagesRead++; 
+                            }
+                        }
+        
+                        else if(simulationOption.equals("A")){
+                            if(pagesRead == 0){
+                                System.out.print("The book is on the page 0");
+                            }
+                            else{
+                                pagesRead--; 
+                            }
+                        }
+        
+                        if(maxPage < pagesRead){
+                            maxPage = pagesRead;
+                        }
+        
+                    }while (!simulationOption.equals("B"));  
+                    controller.addNumberPagesRead(pagesRead, product);
+                }
+                else{
+                    System.out.println("The user doesn't have that product, Type B to back to the library");
+                }
+                 
+            }
+
+        }while (!libraryOption.equals("E"));
+    }
 
 }

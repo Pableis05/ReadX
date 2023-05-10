@@ -1,6 +1,7 @@
 package model;
 
 import java.util.Calendar;
+import java.util.Random;
 
 public class Magazine extends BibliographicProduct{
     
@@ -25,6 +26,21 @@ public class Magazine extends BibliographicProduct{
 
     public void setCategory(CategotyType category) {
         this.category = category;
+    }
+
+
+
+    @Override
+    public String createID() {
+        String alphanumeric = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+        Random random = new Random();
+        StringBuilder codeBuilder = new StringBuilder();
+        for (int i = 0; i < 3; i++) {
+            int index = random.nextInt(alphanumeric.length());
+            char randomChar = alphanumeric.charAt(index);
+            codeBuilder.append(randomChar);
+        }
+        return codeBuilder.toString();
     }
 
     
