@@ -3,7 +3,6 @@ import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Scanner;
 
-import model.BibliographicProduct;
 import model.ControllerLibrary;
 
 
@@ -30,6 +29,7 @@ public class ReadXSystem {
         do{ 
             System.out.printf("%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n", "Type the option that you are going to do", "1. Register a reader", "2. Manage a bibliographic product", "3. Generate basic objects","4. Consult bibliographics products", "5. Buy a book by a reader", "6. Subscribe to a magazine by a reader", "7. Cancel a subscription for a reader", "8. Present library reader", "0. Exit");
             option = input.nextInt();
+            
             switch(option){
 
                 case 1: registerReader();
@@ -195,43 +195,25 @@ public class ReadXSystem {
                 System.out.println("Type the id reader");
                 String idReader = input.next();
                 System.out.println("Type the id product");
+                input.nextLine();
                 String idProduct = input.next();
                 String simulationOption = "";
-                int pagesRead = 0;
-                int maxPage = 0;
-                BibliographicProduct product = controller.consultObjectProduct(idProduct);
 
                 if(controller.checkUserHaveAProduct(idReader, idProduct)){ 
-                    do {
-                        System.out.println("Reader sesion in progress \n Reading: " +  product.getNameProduct() + "\n Reading page: " + pagesRead + " of "+ product.getNumberPages()
-                        +"\n Type A for the previous page \n Type S for the next page\n Type B to back to the library");
-                        
+                
+                    while (!simulationOption.equals("B")){
+
+                        System.out.println(controller.sesionLecture(idProduct, idReader,simulationOption));
                         simulationOption = input.next();
-        
-                        if(simulationOption.equals("S")){
-                            if(pagesRead == controller.consultObjectProduct(idProduct).getNumberPages()){
-                                System.out.print("\nThe book is on the last page");
-                            }
-                            else{
-                                pagesRead++; 
-                            }
-                        }
-        
-                        else if(simulationOption.equals("A")){
-                            if(pagesRead == 0){
-                                System.out.print("The book is on the page 0");
-                            }
-                            else{
-                                pagesRead--; 
-                            }
-                        }
-        
-                        if(maxPage < pagesRead){
-                            maxPage = pagesRead;
-                        }
-        
-                    }while (!simulationOption.equals("B"));  
-                    controller.addNumberPagesRead(pagesRead, product);
+
+                    }
+                    
+                    controller.addNumberPagesRead(controller.consultObjectReader(idReader).getLastSesionPage(), controller.consultObjectProduct(idProduct));
+                    System.out.println(controller.consultObjectReader(idReader).getLastSesionPage());
+                    System.out.println(controller.consultObjectReader(idReader).getCurrentSesionPage());
+                    controller.consultObjectReader(idReader).setCurrentSesionPage(1);
+                    controller.consultObjectReader(idReader).setLastSesionPage(0);
+
                 }
                 else{
                     System.out.println("The user doesn't have that product, Type B to back to the library");

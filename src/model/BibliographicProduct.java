@@ -59,7 +59,11 @@ public abstract class BibliographicProduct {
         this.url = url;
     }
 
-    public void setValueProduct(double valueProduct) {
+    public void setIdProduct(String idProduct) {
+		this.idProduct = idProduct;
+	}
+
+	public void setValueProduct(double valueProduct) {
         this.valueProduct = valueProduct;
     }
 

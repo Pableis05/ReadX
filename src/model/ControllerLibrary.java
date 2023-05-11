@@ -3,15 +3,18 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Random;
 
 public class ControllerLibrary{
 
     private ArrayList<Reader>readers;
     private ArrayList<BibliographicProduct>bibliographicProducts;
+    
 
     public ControllerLibrary(){
         readers = new ArrayList<Reader>();
         bibliographicProducts = new ArrayList<BibliographicProduct>();
+        
     }
 
     public String addReader(boolean premiumReader, String nameReader, String idReader){
@@ -157,27 +160,36 @@ public class ControllerLibrary{
     }
 
     public String removeProducts(String id){
-        int product = searchNumberBibliograpicProduct(id);
+        BibliographicProduct product = consultObjectProduct(id);
         bibliographicProducts.remove(product);
+        for (int i = 0; i < readers.size(); i++) {
+            if(readers.get(i).checkUserHaveAProduct(product)){
+                readers.get(i).removeProduct(product);
+            }
+        }
         return "The bibliographic product have been removed";
     }
 
     public String initBasicObjects(){
-        ArrayList<Reader>readers = new ArrayList<>();
-        ArrayList<BibliographicProduct> bibliographicProducts = new ArrayList<>();
+
         Reader auxReader;
         BibliographicProduct auxbBibliographicProduct;
+        Calendar calendarTime = Calendar.getInstance();
+
         for (int i = 0; i < 3; i++) {
-            auxReader = new Regular("user"+i, "i"+i);
+            auxReader = new Regular("user"+i, "00"+i);
             readers.add(auxReader);
-            auxReader = new Premium("user"+i, "i"+i+100);
+            auxReader = new Premium("user"+i, "99"+i);
             readers.add(auxReader);
-            auxbBibliographicProduct = new Book("book"+i, i+1000, null, "url data", i, "review data", i);
+            auxbBibliographicProduct = new Book("Book"+i, 10, calendarTime, "url data", 10, "review data", 1);
+            auxbBibliographicProduct.setIdProduct("aa"+i);
             bibliographicProducts.add(auxbBibliographicProduct);
-            auxbBibliographicProduct = new Magazine("Magazine"+i, i+10000, null, "url data", i, "review data", i);
+            auxbBibliographicProduct = new Magazine("Magazine"+i, 10, calendarTime, "url data", 10, "review data", 1);
+            auxbBibliographicProduct.setIdProduct("bb"+i);
             bibliographicProducts.add(auxbBibliographicProduct);
         }
-        return "3 premium readers, 3 regular readers, 3 books, 3 magazine has been created";
+        return "3 premium readers (id: 00 + iteration), 3 regular readers (id: 99 + iteration), 3 books (id: aa + iteration[0-2]), 3 magazine has been created (id: bb + iteration[0-2])";
+
     }
 
     public boolean checkTypeBibliographicProduct(String id){
@@ -235,7 +247,7 @@ public class ControllerLibrary{
         Reader reader = consultObjectReader(idReader);
         BibliographicProduct magazine = consultObjectProduct(idMagazine);
         magazine.decreaseAmountSales();
-        String confirmation = reader.removeMagazine((Magazine)magazine);
+        String confirmation = reader.removeProduct(magazine);
         
         return confirmation;
     }
@@ -248,6 +260,52 @@ public class ControllerLibrary{
            haveProduct = true; 
         }
         return haveProduct;
+    }
+
+    public String sesionLecture(String idProduct, String idReader, String simulationOption){
+        String msg = "";
+        AddType add;
+        Reader reader = consultObjectReader(idReader);
+        BibliographicProduct product = consultObjectProduct(idProduct);
+
+        if(simulationOption.equals("S")){
+            if(reader.getCurrentSesionPage() == product.getNumberPages()){
+                msg += ("The book is on the last page");
+            }
+            else{
+                reader.addAmountSesionPage();
+            }
+        }
+        
+        else if(simulationOption.equals("A")){
+            if(reader.getCurrentSesionPage() == 0){
+                msg += ("The book is on the page 0");
+            }
+            else{
+                reader.decreaseAmountSesionPage(); 
+            }
+        }
+
+        if(reader instanceof Regular && ((reader.getCurrentSesionPage() % 20 == 0) || reader.getCurrentSesionPage() == 1)){
+            Random random = new Random();
+            int auxAdd = random.nextInt(3)+1;
+            if(auxAdd == 1){
+                add = AddType.COMBO_PLUS;
+                msg += "Subscribe to Combo Plus and get Disney+ and Star+ at an incredible price!";
+            }else if(auxAdd == 2){
+                add = AddType.LAIKA;
+                msg += "Now your pets have a favorite app: Laika. The best products for your furry.";
+            }else{
+                add = AddType.EXITO;
+                msg += "We are celebrating our anniversary! Visit your nearest Éxito and be surprised with the best offers.";
+            }
+        }
+
+        msg += ("\nReader sesion in progress \n Reading: " + product.getNameProduct() + "\n Reading page: " + reader.getCurrentSesionPage() + " of "+ product.getNumberPages()
+                +"\n Type A for the previous page \n Type S for the next page\n Type B to back to the library");
+
+        return msg;
+
     }
 
     public void addNumberPagesRead(int newPages, BibliographicProduct product){

@@ -34,10 +34,10 @@ public class Book extends BibliographicProduct{
     @Override
     public String createID() {
         Random random = new Random();
-        int randomNumber = random.nextInt();
+        int randomNumber = random.nextInt(4096);
         String hexCode = Integer.toHexString(randomNumber);
-        while(hexCode.length() > 0){
-            hexCode = "0" +hexCode;
+        while(hexCode.length() < 3){
+            hexCode = "0" + hexCode;
         }
         return hexCode;
     }
