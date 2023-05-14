@@ -15,8 +15,8 @@ public class Regular extends Reader{
     @param nameReader the name of the Regular Reader
     @param idReader the ID of the Regular Reader
     */
-    public Regular(String nameReader, String idReadder){
-        super(nameReader, idReadder);
+    public Regular(String nameReader, String idReader){
+        super(nameReader, idReader);
         books = new ArrayList<>(5);
         magazines = new ArrayList<>(2);
     }
