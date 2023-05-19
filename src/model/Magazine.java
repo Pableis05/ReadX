@@ -77,5 +77,25 @@ public class Magazine extends BibliographicProduct{
         return codeBuilder.toString();
     }
 
+    /**
+     * The function returns the value of the "periodicity" variable as a string.
+     * 
+     * @return The method is returning a String value, which is the value of the variable
+     * "periodicity".
+     */
+    public String getPeriodicity() {
+        return periodicity;
+    }
+
+    /**
+     * This function returns the category type.
+     * 
+     * @return The method `getCategory()` is returning an object of type `CategoryType`.
+     */
+    public CategotyType getCategory() {
+        return category;
+    }
+
+    
     
 }

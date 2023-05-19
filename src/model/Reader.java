@@ -1,6 +1,8 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * The Reader class contains information about a reader, including their name, ID, current and last
@@ -14,6 +16,7 @@ public abstract class Reader {
     private int lastSessionPage;
     protected ArrayList<Book>books;
     protected ArrayList<Magazine>magazines;
+    private ArrayList<BibliographicProduct>auxBibliographicProducts;
 
     /**
     Constructs a new Reader object with a name and an identification number.
@@ -25,7 +28,24 @@ public abstract class Reader {
         this.idReader = idReadder;
         currentSessionPage = 1;
         lastSessionPage = 0;
+        auxBibliographicProducts = new ArrayList<>();
     }
+
+    /**
+     * This Java function returns the ArrayList of BibliographicProducts of the user sorted by their publication
+     * date.
+     * 
+     * @return The user ArrayList of BibliographicProduct objects sorted by their publication date.
+     */
+    public ArrayList<BibliographicProduct> returnBibliographicProductsByDate(){
+        auxBibliographicProducts = new ArrayList<>();
+        auxBibliographicProducts.addAll(books);
+        auxBibliographicProducts.addAll(magazines);
+        Collections.sort(auxBibliographicProducts, Comparator.comparing(BibliographicProduct::getPublicationDate));
+        return auxBibliographicProducts;
+    }
+
+    
 
     /**
      * This function increments the current session page and updates the last session page if
@@ -199,6 +219,11 @@ public abstract class Reader {
     public void setLastSessionPage(int lastSesionPage) {
 		this.lastSessionPage = lastSesionPage;
 	}
+
+    public ArrayList<BibliographicProduct> getAuxBibliographicProducts() {
+        return auxBibliographicProducts;
+    }
     
+
     
 }

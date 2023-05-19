@@ -72,5 +72,15 @@ public class Book extends BibliographicProduct{
         return hexCode;
     }
 
+    public String getReview() {
+        return review;
+    }
+
+    public GenderType getGender() {
+        return gender;
+    }
+
+    
+
     
 }

@@ -94,6 +94,12 @@ public abstract class BibliographicProduct {
         this.nameProduct = nameProduct;
     }
 
+    
+
+    public Calendar getPublicationDate() {
+        return publicationDate;
+    }
+
     /**
      * This Java function sets the number of pages for a document.
      * 

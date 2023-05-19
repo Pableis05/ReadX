@@ -3,6 +3,7 @@ import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Scanner;
 
+
 import model.ControllerLibrary;
 
 /**
@@ -44,7 +45,7 @@ public class ReadXSystem {
         int option = -1;
         do{ 
             System.out.println("-------------------------------------------MENU------------------------------------\n");
-            System.out.printf("%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n", "Type the option that you are going to do", "1. Register a reader", "2. Manage a bibliographic product", "3. Generate basic objects","4. Consult bibliographics products", "5. Buy a book by a reader", "6. Subscribe to a magazine by a reader", "7. Cancel a subscription for a reader", "8. Present library reader", "0. Exit");
+            System.out.printf("%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n", "Type the option that you are going to do", "1. Register a reader", "2. Manage a bibliographic product", "3. Generate basic objects","4. Consult bibliographics products", "5. Buy a book by a reader", "6. Subscribe to a magazine by a reader", "7. Cancel a subscription for a reader", "8. Present library reader","9. Generate reports" ,"0. Exit");
             while (!integerInput(input)){
                input.nextLine();
                System.out.println("Enter again"); 
@@ -67,7 +68,9 @@ public class ReadXSystem {
                 break;
                 case 7: cancelSubscriptionMagazineOfReader();
                 break;
-                case 8: presentLibraryReader();
+                case 8: presentLibraryReaderToReadAProduct();
+                break;
+                case 9: generateReports();
                 break;
                 case 0: System.out.println("Thank you!!!!!!!!!!!");
                 break;
@@ -268,6 +271,7 @@ public class ReadXSystem {
     public void generateAutomaticObjects(){
         String confirmationCreation = controller.initBasicObjects(); 
         System.out.println(confirmationCreation);
+        presentLibraryReaderToReadAProduct();   
     }
 
     /**
@@ -325,41 +329,103 @@ public class ReadXSystem {
      * This function presents a library reader simulation and allows the user to input their reader and
      * product IDs to start a reading session.
      */
-    public void presentLibraryReader(){
+    public void presentLibraryReaderToReadAProduct(){
         String libraryOption = "";
-        
+        System.out.println("Type the id reader");
+        String idReader = input.next();
+        String idProduct = "";
+        controller.enterProductsToTensorLibrary(idReader);
         do{
-            System.out.println("Type A to do a simultation, E to exit");
-            libraryOption = input.next();
-            if (libraryOption.equals("A")) {
-                System.out.println("Type the id reader");
-                String idReader = input.next();
-                System.out.println("Type the id product");
-                input.nextLine();
-                String idProduct = input.next();
-                String simulationOption = "";
-
-                if(controller.searchNumberReader(idReader)!= -1 && controller.searchNumberBibliograpicProduct(idProduct) != -1 && controller.checkUserHaveAProduct(idReader, idProduct) ){ 
-                
-                    while (!simulationOption.equals("B")){
-
-                        System.out.println(controller.readingSession(idProduct, idReader,simulationOption));
-                        simulationOption = input.next();
-
+            int shelves = 0;
+            do {
+                if(!(shelves == controller.getNumberMatrixOfLibrary(idReader))&& !(shelves == -1)){
+                    System.out.println(controller.showLibraryUser(idProduct, shelves));
+                    libraryOption = input.next();
+                    if(libraryOption.equals("A")){   
+                        shelves++;
                     }
-                    
-                    controller.addNumberPagesRead(controller.consultObjectReader(idReader).getLastSessionPage(), controller.consultObjectProduct(idProduct));
-                    controller.consultObjectReader(idReader).setCurrentSessionPage(1);
-                    controller.consultObjectReader(idReader).setLastSessionPage(0);
-
+                    else if(libraryOption.equals("S")){
+                        shelves--;
+                    }
+                    else if(libraryOption.matches("\\d+,\\d+")){
+                        String[] axis = libraryOption.split(",");
+                        String xAux = axis[0];
+                        String yAux = axis[1];
+                        int x = Integer.parseInt(xAux);
+                        int y = Integer.parseInt(yAux);
+                        String[][] temp = controller.getLibraryUser().get(shelves);
+                        idProduct = temp[x][y];
+                    }   
+                    else{
+                        idProduct = libraryOption;
+                    }
                 }
                 else{
-                    System.out.println("That user doesn't have that product");
+                    if(shelves > 0){
+                        System.out.println(controller.showLibraryUser(idProduct, shelves-1));
+                        libraryOption = input.next();  
+                        if(libraryOption.equals("S")){
+                            shelves--;
+                        }                       
+                    }else{
+                        System.out.println(controller.showLibraryUser(idProduct, shelves+1));
+                        libraryOption = input.next();
+                        if(libraryOption.equals("A")){   
+                            shelves++;
+                        }
+                    }
+                    
                 }
-                 
+            } while ((libraryOption.equals("A")||(libraryOption.equals("S" ))));
+            
+            String simulationOption = "";
+            if(controller.searchNumberReader(idReader)!= -1 && controller.searchNumberBibliograpicProduct(idProduct) != -1 && controller.checkUserHaveAProduct(idReader, idProduct) ){ 
+                
+                while (!simulationOption.equals("B")){
+
+                    System.out.println(controller.readingSession(idProduct, idReader,simulationOption));
+                    simulationOption = input.next();
+
+                }
+                    
+                controller.addNumberPagesRead(controller.consultObjectReader(idReader).getLastSessionPage(), controller.consultObjectProduct(idProduct));
+                controller.consultObjectReader(idReader).setCurrentSessionPage(1);
+                controller.consultObjectReader(idReader).setLastSessionPage(0);
+
             }
+            else{
+                System.out.println("That user can't read that bibliographic for the library restricctions");
+            }
+                 
 
         }while (!libraryOption.equals("E"));
+    }
+
+    public void generateReports(){
+        System.out.println("Type the report you are going to do:\n 1. Total read pages amount in all platform by product\n 2. Gender and Category most read\n 3. Top 5 books and Top 5 magazines most read\n 4. amount sold books by gender\n 5. amount active subscribed users");
+        int intReport = input.nextInt();
+        String report = "";
+        switch (intReport) {
+            case 1:
+                report = controller.amountReadPagesByProductType();
+                break;
+            case 2:
+                report = controller.genderAndCategoryMoreRead();
+                break;
+            case 3:
+                report = controller.topFiveBooksAndMagazinesMostRead();
+                break;
+            case 4:
+                report = controller.amountSoldBooksAndValueByGender();
+                break;
+            case 5:
+                report = controller.amountSoldMagazinesAndValueByCategory();
+                break;
+            default:
+                System.out.println("Not valid number");
+                break;
+        }
+        System.out.println(report);
     }
 
     /**
