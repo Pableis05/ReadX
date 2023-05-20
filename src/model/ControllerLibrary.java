@@ -3,7 +3,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Random;
@@ -349,12 +348,12 @@ public class ControllerLibrary{
         BibliographicProduct auxbBibliographicProduct;
         Calendar calendarTime = Calendar.getInstance();
 
-        auxReader = new Regular("user1", "001");
-        readers.add(auxReader);
+        //auxReader = new Regular("user1", "001");
+        //readers.add(auxReader);
         auxReader = new Premium("user2", "999");
         readers.add(auxReader);
 
-        for (int i = 0; i < 51; i++) {
+        for (int i = 0; i < 10; i++) {
             auxbBibliographicProduct = new Book("Book"+i, 25, calendarTime, "url data", 10, "review data", 1);
             if(i < 10){
                 auxbBibliographicProduct.setIdProduct("aa"+i);
@@ -612,7 +611,7 @@ public class ControllerLibrary{
     public String showLibraryUser(String idReader, int matrixNumber){
         int column = 0;
         Reader reader = consultObjectReader(idReader);
-        String productsCodeShelves = reader.getNameReader() + " library:";
+        String productsCodeShelves = reader.getNameReader() + " library:\n";
         productsCodeShelves += "   |   0   |   1   |   2   |   3   |   4\n"+column;
         String[][] temp = libraryUser.get(matrixNumber);
         for (int i = 0; i < 5; i++) {
@@ -708,10 +707,10 @@ public class ControllerLibrary{
             }
         }
         int auxGender = mostReadGenderList[0];
-        int biggestGenderInt = -1;
+        int biggestGenderInt = 0;
         int auxCategory = mostReadCategoryList[0];
-        int biggestCategoryInt = -1;
-        String mostReadGender="", mostReadCategory="";
+        int biggestCategoryInt = 0;
+        String mostReadGender = "", mostReadCategory="";
         for (int i = 0; i < 3; i++) {
             if(mostReadGenderList[i] > auxGender){
                 biggestGenderInt = i;
@@ -753,11 +752,19 @@ public class ControllerLibrary{
         Collections.sort(magazines,Comparator.comparing(Magazine::getAmountPagesRead));
         String msg = "The top five books for pages read are:";
         for (int i = 0; i < 5; i++) {
-            msg += "\n"+i+". Book name: "+books.get(i).getNameProduct() + ", Gender: " +books.get(i).getGender() + ", amount pages read: " + books.get(i).getAmountPagesRead();
-        }
-        msg += "The top five magazines for pages read are:";
+            if((books.size() > i)){
+                msg += "\n"+(i+1)+". Book name: "+books.get(i).getNameProduct() + ", Gender: " +books.get(i).getGender() + ", amount pages read: " + books.get(i).getAmountPagesRead();
+            }else{
+                msg += "\n"+(i+1)+". Empty place Book";
+            }
+        } 
+        msg += "\nThe top five magazines for pages read are:";
         for (int i = 0; i < 5; i++) {
-            msg += "\n"+i+". Magazine name: "+magazines.get(i).getNameProduct() + ", Category: " +magazines.get(i).getCategory() + ", amount pages read: " + magazines.get(i).getAmountPagesRead();
+            if((magazines.size() > i)){
+                msg += "\n"+(i+1)+". Magazine name: "+magazines.get(i).getNameProduct() + ", Category: " +magazines.get(i).getCategory() + ", amount pages read: " + magazines.get(i).getAmountPagesRead();
+            }else{
+                msg += "\n"+(i+1)+". Empty place Magazine";
+            }
         }
         return msg;
     }

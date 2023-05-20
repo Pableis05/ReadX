@@ -270,8 +270,7 @@ public class ReadXSystem {
      */
     public void generateAutomaticObjects(){
         String confirmationCreation = controller.initBasicObjects(); 
-        System.out.println(confirmationCreation);
-        presentLibraryReaderToReadAProduct();   
+        System.out.println(confirmationCreation);   
     }
 
     /**
@@ -332,6 +331,7 @@ public class ReadXSystem {
     public void presentLibraryReaderToReadAProduct(){
         String libraryOption = "";
         System.out.println("Type the id reader");
+        input.nextLine();
         String idReader = input.next();
         String idProduct = "";
         controller.enterProductsToTensorLibrary(idReader);
@@ -339,7 +339,7 @@ public class ReadXSystem {
             int shelves = 0;
             do {
                 if(!(shelves == controller.getNumberMatrixOfLibrary(idReader))&& !(shelves == -1)){
-                    System.out.println(controller.showLibraryUser(idProduct, shelves));
+                    System.out.println(controller.showLibraryUser(idReader, shelves));
                     libraryOption = input.next();
                     if(libraryOption.equals("A")){   
                         shelves++;
@@ -362,13 +362,13 @@ public class ReadXSystem {
                 }
                 else{
                     if(shelves > 0){
-                        System.out.println(controller.showLibraryUser(idProduct, shelves-1));
+                        System.out.println(controller.showLibraryUser(idReader, shelves-1));
                         libraryOption = input.next();  
                         if(libraryOption.equals("S")){
                             shelves--;
                         }                       
                     }else{
-                        System.out.println(controller.showLibraryUser(idProduct, shelves+1));
+                        System.out.println(controller.showLibraryUser(idReader, shelves+1));
                         libraryOption = input.next();
                         if(libraryOption.equals("A")){   
                             shelves++;

@@ -94,8 +94,11 @@ public abstract class BibliographicProduct {
         this.nameProduct = nameProduct;
     }
 
-    
-
+    /**
+     * This function returns the publication date as a Calendar object.
+     * 
+     * @return The method is returning a Calendar object representing the publication date.
+     */
     public Calendar getPublicationDate() {
         return publicationDate;
     }
@@ -203,6 +206,17 @@ public abstract class BibliographicProduct {
         return amountPagesRead;
     }
 
+    /**
+     * The function returns a string representing a URL.
+     * 
+     * @return The method `getUrl()` is returning a `String` value, which is the value of the variable
+     * `url`.
+     */
+    public String getUrl() {
+        return url;
+    }
+
+    
     
     
 

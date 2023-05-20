@@ -72,10 +72,21 @@ public class Book extends BibliographicProduct{
         return hexCode;
     }
 
+    /**
+     * This function returns a string representing a review.
+     * 
+     * @return The method `getReview()` is returning a `String` value, which is the value of the
+     * variable `review`.
+     */
     public String getReview() {
         return review;
     }
 
+    /**
+     * The function returns the gender type.
+     * 
+     * @return The method is returning a value of the `GenderType` enum type.
+     */
     public GenderType getGender() {
         return gender;
     }
