@@ -45,7 +45,7 @@ public class ReadXSystem {
         int option = -1;
         do{ 
             System.out.println("-------------------------------------------MENU------------------------------------\n");
-            System.out.printf("%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n", "Type the option that you are going to do", "1. Register a reader", "2. Manage a bibliographic product", "3. Generate basic objects","4. Consult bibliographics products", "5. Buy a book by a reader", "6. Subscribe to a magazine by a reader", "7. Cancel a subscription for a reader", "8. Present library reader","9. Generate reports" ,"0. Exit");
+            System.out.printf("%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n", "Type the option that you are going to do", "1. Generate basic objects", "2. Register a reader", "3. Manage a bibliographic product","4. Consult bibliographics products", "5. Buy a book by a reader", "6. Subscribe to a magazine by a reader", "7. Cancel a subscription for a reader", "8. Present library reader","9. Generate reports" ,"0. Exit");
             while (!integerInput(input)){
                input.nextLine();
                System.out.println("Enter again"); 
@@ -54,11 +54,11 @@ public class ReadXSystem {
 
             switch(option){
 
-                case 1: registerReader();
+                case 1: generateAutomaticObjects();
                 break;
-                case 2: manageBibliographicProducts();
+                case 2: registerReader();
                 break;
-                case 3: generateAutomaticObjects();
+                case 3: manageBibliographicProducts();
                 break;
                 case 4: consultBibliographicProducts();
                 break;

@@ -8,7 +8,7 @@ import java.util.Comparator;
  * The Reader class contains information about a reader, including their name, ID, current and last
  * session page, and the books and magazines they have access to.
  */
-public abstract class Reader {
+public abstract class Reader implements AddProduct{
 
     private String nameReader;
     private String idReader;
@@ -45,8 +45,6 @@ public abstract class Reader {
         return auxBibliographicProducts;
     }
 
-    
-
     /**
      * This function increments the current session page and updates the last session page if
      * necessary.
@@ -76,7 +74,7 @@ public abstract class Reader {
     /**
      * This function decreases the value of the current session page by 1.
      */
-    public void decreaseAmountSesionPage(){
+    public void decreaseAmountSessionPage(){
         this.currentSessionPage--;
     }
 
@@ -119,27 +117,6 @@ public abstract class Reader {
 		this.currentSessionPage = currentSesionPage;
 	}
 
-	/**
-     * This is an abstract method that adds a book to a collection.
-     * 
-     * @param book The "book" parameter is an object of the class "Book". It is being passed as an
-     * argument to the method "addBook". The method is expected to use the information contained in the
-     * "book" object to add a new book to a collection or database. The "Book" class likely
-     * @return A String is being returned.
-     */
-    public abstract String addBook(Book book);
-
-    /**
-     * This is an abstract method that adds a magazine and returns a string.
-     * 
-     * @param magazine The "magazine" parameter is an object of the class "Magazine". It is being
-     * passed as an argument to the method "addMagazine". The method is expected to use this object to
-     * add a new magazine to some kind of collection or database and return a string indicating the
-     * success or failure
-     * @return A String is being returned.
-     */
-    public abstract String addMagazine(Magazine magazine);
-
     /**
      * This function removes a bibliographic product (magazine) from a list and returns a message
      * indicating that the user has been unsubscribed from the magazine.
@@ -149,6 +126,7 @@ public abstract class Reader {
      * @return The method is returning a String message that says "The user have been desuscribe of the
      * magazine".
      */
+    @Override
     public String removeProduct(BibliographicProduct bibliographicProduct){
         String msg = "The user have been desuscribe of the magazine";
         magazines.remove(bibliographicProduct);

@@ -54,8 +54,6 @@ public class Book extends BibliographicProduct{
         this.gender = gender;
     }
 
-    
-
     /**
      * The function generates a random hexadecimal ID with a length of 3 digits.
      * 

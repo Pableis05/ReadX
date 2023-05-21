@@ -551,14 +551,14 @@ public class ControllerLibrary{
      * through the pages. It may also include advertisements for certain products or services.
      */
     public String readingSession(String idProduct, String idReader, String simulationOption){
-        String msg = "";
+        String pageProduct = "";
         AdType ad;
         Reader reader = consultObjectReader(idReader);
         BibliographicProduct product = consultObjectProduct(idProduct);
 
         if(simulationOption.equals("S")){
             if(reader.getCurrentSessionPage() == product.getNumberPages()){
-                msg += ("The book is on the last page");
+                pageProduct += ("The book is on the last page");
             }
             else{
                 reader.addAmountSessionPage();
@@ -567,10 +567,10 @@ public class ControllerLibrary{
         
         else if(simulationOption.equals("A")){
             if(reader.getCurrentSessionPage() == 0){
-                msg += ("The book is on the page 0");
+                pageProduct += ("The book is on the page 0");
             }
             else{
-                reader.decreaseAmountSesionPage(); 
+                reader.decreaseAmountSessionPage(); 
             }
         }
 
@@ -579,20 +579,20 @@ public class ControllerLibrary{
             int auxAdd = random.nextInt(3)+1;
             if(auxAdd == 1){
                 ad = AdType.COMBO_PLUS;
-                msg += ad + ": Subscribe to Combo Plus and get Disney+ and Star+ at an incredible price!";
+                pageProduct += ad + ": Subscribe to Combo Plus and get Disney+ and Star+ at an incredible price!";
             }else if(auxAdd == 2){
                 ad = AdType.LAIKA;
-                msg += ad +": Now your pets have a favorite app: Laika. The best products for your furry.";
+                pageProduct += ad +": Now your pets have a favorite app: Laika. The best products for your furry.";
             }else{
                 ad = AdType.EXITO;
-                msg += ad + ": We are celebrating our anniversary! Visit your nearest Éxito and be surprised with the best offers.";
+                pageProduct += ad + ": We are celebrating our anniversary! Visit your nearest Éxito and be surprised with the best offers.";
             }
         }
 
-        msg += ("\nReader sesion in progress \n Reading: " + product.getNameProduct() + "\n Reading page: " + reader.getCurrentSessionPage() + " of "+ product.getNumberPages()
-                +"\n Type A for the previous page \n Type S for the next page\n Type B to back to the library");
+        pageProduct += ("\nReader sesion in progress \n Reading: " + product.getNameProduct() + "\n Reading page: " + reader.getCurrentSessionPage() + " of "+ product.getNumberPages()
+        +"\n Type A for the previous page \n Type S for the next page\n Type B to back to the library");
 
-        return msg;
+        return pageProduct;
 
     }
 
@@ -611,27 +611,24 @@ public class ControllerLibrary{
     public String showLibraryUser(String idReader, int matrixNumber){
         int column = 0;
         Reader reader = consultObjectReader(idReader);
-        String productsCodeShelves = reader.getNameReader() + " library:\n";
-        productsCodeShelves += "   |   0   |   1   |   2   |   3   |   4\n"+column;
+        String library = reader.getNameReader() + " library:\n";
+        library += "   |   0   |   1   |   2   |   3   |   4\n"+column;
         String[][] temp = libraryUser.get(matrixNumber);
         for (int i = 0; i < 5; i++) {
             for (int j = 0; j < 5; j++) {
-                productsCodeShelves += "  |  "+temp[i][j] ;
+                library += "  |  "+temp[i][j] ;
             }
             column++;
             if(column < 5){
-                productsCodeShelves += "\n"+column;
+                library += "\n"+column;
             }
         }
-        productsCodeShelves += "\nType the coordinate x,y (x for Row and y for Column example 2,5)  or the corresponding code of the bibliographic product to start a reading sesion\nType A to the next page\nType S to the previous page\nType E to the exit";
-        return productsCodeShelves;
+        library += "\nType the coordinate x,y (x for Row and y for Column example 2,5)  or the corresponding code of the bibliographic product to start a reading sesion\nType A to the next page\nType S to the previous page\nType E to the exit";
+        return library;
     }
 
     public void enterProductsToTensorLibrary(String idUser){
         Reader reader = consultObjectReader(idUser);
-        System.out.println(reader.returnBibliographicProductsByDate());
-        System.out.println(reader.returnBibliographicProductsByDate().size());
-        System.out.println(Math.ceil((double) reader.returnBibliographicProductsByDate().size()/25));
         ArrayList<BibliographicProduct>auxBibliographicProducts = reader.returnBibliographicProductsByDate();
         double max = Math.ceil((double) reader.returnBibliographicProductsByDate().size()/25);
         int aux = 0;
@@ -660,7 +657,7 @@ public class ControllerLibrary{
     }
     
     public ArrayList<String[][]> getLibraryUser() {
-        return libraryUser;
+      return libraryUser;
     }
 
     public String amountReadPagesByProductType(){
