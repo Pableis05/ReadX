@@ -206,8 +206,4 @@ public abstract class BibliographicProduct implements CreateID{
         return url;
     }
 
-    
-    
-    
-
 }

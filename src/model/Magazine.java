@@ -57,8 +57,6 @@ public class Magazine extends BibliographicProduct{
         this.category = category;
     }
 
-
-
     /**
      * The function creates a random alphanumeric ID consisting of three characters.
      * 

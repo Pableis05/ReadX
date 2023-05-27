@@ -2,8 +2,6 @@ package ui;
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Scanner;
-
-
 import model.ControllerLibrary;
 
 /**
@@ -45,7 +43,9 @@ public class ReadXSystem {
         int option = -1;
         do{ 
             System.out.println("-------------------------------------------MENU------------------------------------\n");
-            System.out.printf("%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n", "Type the option that you are going to do", "1. Generate basic objects", "2. Register a reader", "3. Manage a bibliographic product","4. Consult bibliographics products", "5. Buy a book by a reader", "6. Subscribe to a magazine by a reader", "7. Cancel a subscription for a reader", "8. Present library reader","9. Generate reports" ,"0. Exit");
+            System.out.printf("%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n", "Type the option that you are going to do", "1. Generate basic objects", "2. Register a reader", "3. Manage a bibliographic product"
+            ,"4. Consult codes bibliographics products", "5. Buy a book by a reader", "6. Subscribe to a magazine by a reader", "7. Cancel a subscription for a reader", "8. Present library reader","9. Generate reports" ,"0. Exit");
+            System.out.println("-----------------------------------------------------------------------------------\n");
             while (!integerInput(input)){
                input.nextLine();
                System.out.println("Enter again"); 
@@ -76,7 +76,7 @@ public class ReadXSystem {
                 break;
                 default: System.out.println("Enter again, whit a valid number");
             }
-            System.out.println("-----------------------------------------------------------------------------------\n");
+            
         }while(option != 0);
     }
 
@@ -128,8 +128,9 @@ public class ReadXSystem {
         String optionManage = input.next();
         
         if(optionManage.equals("1")){
-            System.out.println("Enter the product name");
             
+            System.out.println("Enter the product name");
+            input.nextLine();
             String name = input.nextLine();
             System.out.println("Enter the pages number");
             int numberPages = 0;
@@ -278,7 +279,7 @@ public class ReadXSystem {
      * search for the product code in a bibliographic database.
      */
     public void consultBibliographicProducts(){
-        System.out.println("Enter the product name");
+        System.out.println("Enter the product name with the neccesary capital letters");
         input.nextLine();
         String searchNameString = input.nextLine();
         String listProducts = controller.consultCodeBibliographicProducts(searchNameString); 
@@ -325,85 +326,99 @@ public class ReadXSystem {
     }
 
     /**
-     * This function presents a library reader simulation and allows the user to input their reader and
-     * product IDs to start a reading session.
-     */
+    * This function allows a library reader to select and read a product from their library, with options
+    * for navigating shelves and tracking reading progress.
+    */
     public void presentLibraryReaderToReadAProduct(){
         String libraryOption = "";
         System.out.println("Type the id reader");
         input.nextLine();
         String idReader = input.next();
         String idProduct = "";
-        controller.enterProductsToTensorLibrary(idReader);
-        do{
-            int shelves = 0;
-            do {
-                if(!(shelves == controller.getNumberMatrixOfLibrary(idReader))&& !(shelves == -1)){
-                    System.out.println(controller.showLibraryUser(idReader, shelves));
-                    libraryOption = input.next();
-                    if(libraryOption.equals("A")){   
-                        shelves++;
-                    }
-                    else if(libraryOption.equals("S")){
-                        shelves--;
-                    }
-                    else if(libraryOption.matches("\\d+,\\d+")){
-                        String[] axis = libraryOption.split(",");
-                        String xAux = axis[0];
-                        String yAux = axis[1];
-                        int x = Integer.parseInt(xAux);
-                        int y = Integer.parseInt(yAux);
-                        String[][] temp = controller.getLibraryUser().get(shelves);
-                        idProduct = temp[x][y];
-                    }   
-                    else{
-                        idProduct = libraryOption;
-                    }
-                }
-                else{
-                    if(shelves > 0){
-                        System.out.println(controller.showLibraryUser(idReader, shelves-1));
-                        libraryOption = input.next();  
-                        if(libraryOption.equals("S")){
-                            shelves--;
-                        }                       
-                    }else{
-                        System.out.println(controller.showLibraryUser(idReader, shelves+1));
+        if(controller.searchNumberReader(idReader) == -1){
+            System.out.println("That user doesnt exist in the platform");
+        }
+        else if(controller.consultObjectReader(idReader).checkUserLibraryIsEmpty()){
+            System.out.println("The user library is empty");
+        }else{
+            controller.enterProductsToTensorLibrary(idReader);
+            do{
+                int shelves = 0;
+                do{
+                    if((shelves != controller.getNumberMatrixOfLibrary(idReader)) && !(shelves < 0)){
+                        System.out.println(controller.showLibraryUser(idReader, shelves));
                         libraryOption = input.next();
-                        if(libraryOption.equals("A")){   
+                        if(libraryOption.equalsIgnoreCase("S")){   
                             shelves++;
                         }
+                        else if(libraryOption.equalsIgnoreCase("A")){
+                            shelves--;
+                        }
+                        else if(libraryOption.matches("\\d+,\\d+")){
+                            String[] axis = libraryOption.split(",");
+                            String xAux = axis[0];
+                            String yAux = axis[1];
+                            int x = Integer.parseInt(xAux);
+                            int y = Integer.parseInt(yAux);
+                            String[][] temp = controller.consultObjectReader(idReader).getLibraryUser().get(shelves);
+                            idProduct = temp[x][y];
+                        }   
+                        else{
+                            idProduct = libraryOption;
+                        }
                     }
+                    else{
+                        if(shelves > 0){
+                            System.out.println(controller.showLibraryUser(idReader, shelves-1));
+                            libraryOption = input.next();  
+                            if(libraryOption.equalsIgnoreCase("A")){
+                                shelves--;
+                            }                       
+                        }else{
+                            System.out.println(controller.showLibraryUser(idReader, shelves+1));
+                            libraryOption = input.next();
+                            if(libraryOption.equalsIgnoreCase("S")){   
+                                shelves++;
+                            }
+                        }
                     
-                }
-            } while ((libraryOption.equals("A")||(libraryOption.equals("S" ))));
+                    } 
+                }while ((libraryOption.equalsIgnoreCase("A")||(libraryOption.equalsIgnoreCase("S" ))));
             
-            String simulationOption = "";
-            if(controller.searchNumberReader(idReader)!= -1 && controller.searchNumberBibliograpicProduct(idProduct) != -1 && controller.checkUserHaveAProduct(idReader, idProduct) ){ 
-                
-                while (!simulationOption.equals("B")){
-
-                    System.out.println(controller.readingSession(idProduct, idReader,simulationOption));
-                    simulationOption = input.next();
-
-                }
+                String simulationOption = "";
+                if(controller.searchNumberReader(idReader)!= -1 && controller.searchNumberBibliograpicProduct(idProduct) != -1 && controller.checkUserHaveAProduct(idReader, idProduct) ){ 
                     
-                controller.addNumberPagesRead(controller.consultObjectReader(idReader).getLastSessionPage(), controller.consultObjectProduct(idProduct));
-                controller.consultObjectReader(idReader).setCurrentSessionPage(1);
-                controller.consultObjectReader(idReader).setLastSessionPage(0);
+                    while (!simulationOption.equalsIgnoreCase("B")){
+                        System.out.println(controller.readingSession(idProduct, idReader,simulationOption));
+                        simulationOption = input.next();
+                    }
+                    System.out.println("-->The "+(controller.consultObjectReader(idReader).getLastSessionPage()+1) +" page was the highest page read<--");
+                    controller.addNumberPagesRead(controller.consultObjectReader(idReader).getLastSessionPage()+1, controller.consultObjectProduct(idProduct));
+                    controller.consultObjectReader(idReader).setCurrentSessionPage(1);
+                    controller.consultObjectReader(idReader).setLastSessionPage(0);
 
-            }
-            else{
-                System.out.println("That user can't read that bibliographic for the library restricctions");
-            }
-                 
+                }else if(libraryOption.equalsIgnoreCase("E")){}
+                else{
+                    System.out.println("That user can't read that bibliographic for the library restricctions");
+                }
 
-        }while (!libraryOption.equals("E"));
+            }while (!libraryOption.equalsIgnoreCase("E"));
+        }
+        
     }
 
+    /**
+     * The function generates reports about all the different users and bibliographic products based on user input and displays the result.
+     */
     public void generateReports(){
         System.out.println("Type the report you are going to do:\n 1. Total read pages amount in all platform by product\n 2. Gender and Category most read\n 3. Top 5 books and Top 5 magazines most read\n 4. amount sold books by gender\n 5. amount active subscribed users");
-        int intReport = input.nextInt();
+        int intReport = -1;
+        while (!integerInput(input)){
+            input.nextLine();
+            System.out.println("Enter again"); 
+        }
+        intReport = input.nextInt();
+        
         String report = "";
         switch (intReport) {
             case 1:

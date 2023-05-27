@@ -42,7 +42,6 @@ public class Regular extends Reader{
             String timeStamp = new SimpleDateFormat("dd-MM-yyyy").format(calendarTime.getTime());
 
             msg = "Confirmation ticket: \n The Book has been added in the Date: "+ timeStamp + " \n The product value is $" + book.getValueProduct() ;
-            
         }
         return msg;
     }

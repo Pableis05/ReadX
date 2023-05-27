@@ -16,7 +16,8 @@ public abstract class Reader implements AddProduct{
     private int lastSessionPage;
     protected ArrayList<Book>books;
     protected ArrayList<Magazine>magazines;
-    private ArrayList<BibliographicProduct>auxBibliographicProducts;
+    private ArrayList<String[][]>libraryUser;
+    
 
     /**
     Constructs a new Reader object with a name and an identification number.
@@ -28,7 +29,7 @@ public abstract class Reader implements AddProduct{
         this.idReader = idReadder;
         currentSessionPage = 1;
         lastSessionPage = 0;
-        auxBibliographicProducts = new ArrayList<>();
+        libraryUser = new ArrayList<>();
     }
 
     /**
@@ -38,11 +39,37 @@ public abstract class Reader implements AddProduct{
      * @return The user ArrayList of BibliographicProduct objects sorted by their publication date.
      */
     public ArrayList<BibliographicProduct> returnBibliographicProductsByDate(){
-        auxBibliographicProducts = new ArrayList<>();
+        ArrayList<BibliographicProduct>auxBibliographicProducts = new ArrayList<>();
         auxBibliographicProducts.addAll(books);
         auxBibliographicProducts.addAll(magazines);
         Collections.sort(auxBibliographicProducts, Comparator.comparing(BibliographicProduct::getPublicationDate));
         return auxBibliographicProducts;
+    }
+
+    
+    /**
+     * The function searches for a bibliographic product by its ID in a list of books and magazines and
+     * returns its position.
+     * 
+     * @param id The parameter "id" is a String representing the unique identifier of a bibliographic
+     * product that needs to be searched for in the "books" and "magazines" ArrayLists.
+     * @return The method is returning an integer value which represents the position of the
+     * BibliographicProduct with the given id in the combined ArrayList of books and magazines. If the
+     * product is not found, the method returns -1.
+     */
+    public int searchNumberBibliograpicProductReader(String id){
+        ArrayList<BibliographicProduct>auxBibliographicProducts = new ArrayList<>();
+        auxBibliographicProducts.addAll(books);
+        auxBibliographicProducts.addAll(magazines);
+        int position = -1;
+        for (int i = 0; i < auxBibliographicProducts.size(); i++) {
+            BibliographicProduct product = auxBibliographicProducts.get(i);
+            if(product.getIdProduct().equals(id)){
+                position = i;
+                break;
+            }
+        }
+        return position;
     }
 
     /**
@@ -107,6 +134,20 @@ public abstract class Reader implements AddProduct{
 		return currentSessionPage;
 	}
 
+    /**
+     * The function checks if the user library is empty by verifying if there are no books or magazines
+     * in it.
+     * 
+     * @return A boolean value is being returned, either true or false.
+     */
+    public boolean checkUserLibraryIsEmpty(){
+        if(books.size() == 0 && magazines.size() == 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
 	/**
      * This Java function sets the current session page.
      * 
@@ -128,8 +169,12 @@ public abstract class Reader implements AddProduct{
      */
     @Override
     public String removeProduct(BibliographicProduct bibliographicProduct){
-        String msg = "The user have been desuscribe of the magazine";
-        magazines.remove(bibliographicProduct);
+        String msg = "The user has been removed the product";
+        if(bibliographicProduct instanceof Book){
+            books.remove(bibliographicProduct);
+        }else{
+            magazines.remove(bibliographicProduct);
+        }
         return  msg;
     }
 
@@ -198,8 +243,13 @@ public abstract class Reader implements AddProduct{
 		this.lastSessionPage = lastSesionPage;
 	}
 
-    public ArrayList<BibliographicProduct> getAuxBibliographicProducts() {
-        return auxBibliographicProducts;
+   /**
+    * This function returns an ArrayList of String arrays representing the library users.
+    * 
+    * @return An ArrayList of two-dimensional String arrays (String[][]) named "libraryUser".
+    */
+    public ArrayList<String[][]> getLibraryUser() {
+        return libraryUser;
     }
     
 

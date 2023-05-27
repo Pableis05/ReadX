@@ -17,9 +17,7 @@ the program requriments that ReadX needs in their library.
 public class ControllerLibrary{
 
     private ArrayList<Reader>readers;
-    private ArrayList<BibliographicProduct>bibliographicProducts;
-    private ArrayList<String[][]>libraryUser = new ArrayList<>();
-    
+    private ArrayList<BibliographicProduct>bibliographicProducts;    
     
     /**
     Constructor for the ControllerLibrary class.
@@ -47,6 +45,8 @@ public class ControllerLibrary{
         String msg;
         if(!checkIdReader(idReader)){
             msg = "That ID is not valid, because someone has it";
+        }else if(idReader.equalsIgnoreCase("001") ||idReader.equalsIgnoreCase("999") ){
+            msg = "This id is reserved for the option: Generate basic objects";
         }
         else if(premiumReader){
             Reader premium = new Premium(nameReader, idReader);
@@ -320,8 +320,9 @@ public class ControllerLibrary{
      * @return The method is returning a String message "The bibliographic product have been removed".
      */
     public String removeProducts(String id){
+        String msg = "The bibliographic product have been removed\n";
         if (searchNumberBibliograpicProduct(id) == -1) {
-            return "That id doesn't match with a product";
+            return msg = "That id doesn't match with a product";
         } else {
             BibliographicProduct product = consultObjectProduct(id);
             bibliographicProducts.remove(product);
@@ -330,7 +331,7 @@ public class ControllerLibrary{
                     readers.get(i).removeProduct(product);
                 }
             }
-            return "The bibliographic product have been removed";
+            return msg;
         }
         
     }
@@ -343,17 +344,18 @@ public class ControllerLibrary{
      * reader, 1 book, and 1 magazine have been created with specific IDs.
      */
     public String initBasicObjects(){
-
+        String msg;
         Reader auxReader;
         BibliographicProduct auxbBibliographicProduct;
         Calendar calendarTime = Calendar.getInstance();
 
-        //auxReader = new Regular("user1", "001");
-        //readers.add(auxReader);
+        auxReader = new Regular("user1", "001");
+        readers.add(auxReader);
+
         auxReader = new Premium("user2", "999");
         readers.add(auxReader);
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 25; i++) {
             auxbBibliographicProduct = new Book("Book"+i, 25, calendarTime, "url data", 10, "review data", 1);
             if(i < 10){
                 auxbBibliographicProduct.setIdProduct("aa"+i);
@@ -364,13 +366,14 @@ public class ControllerLibrary{
             auxReader.addBook((Book)auxbBibliographicProduct);     
         }
 
-        //auxbBibliographicProduct = new Magazine("Magazine", 10, calendarTime, "url data", 10, "review data", 1);
-        //auxbBibliographicProduct.setIdProduct("bb1");
-        //bibliographicProducts.add(auxbBibliographicProduct);
-        //auxReader.addMagazine((Magazine)auxbBibliographicProduct);
-        
-        return "1 regular reader (id: 001), 1 premium reader (id: 999), 1 book (id: aa1), 1 magazine has been created (id: bb1)";
+        auxbBibliographicProduct = new Magazine("Magazine0", 11, calendarTime, "url data", 10, "review data", 1);
+        auxbBibliographicProduct.setIdProduct("bb1");
+        bibliographicProducts.add(auxbBibliographicProduct);
+        auxReader.addMagazine((Magazine)auxbBibliographicProduct); 
 
+        msg =  "The system create: \n 1 regular reader (id: 001) with 0 products, \n 1 premium reader (id: 999) with 25 books (ids: aa+(0-9) and a+(10-24)) and 1 magazine (id: bb1)";
+        return msg;
+        
     }
 
     /**
@@ -407,8 +410,8 @@ public class ControllerLibrary{
         for (int i = 0; i < bibliographicProducts.size(); i++) {
             if(bibliographicProducts.get(i).getNameProduct().contains(searchName)){
                 find = true;
-                msg += "Match " +followUp +":"+bibliographicProducts.get(i).getNameProduct();
-                msg += "\nCode match" + followUp + ":"+bibliographicProducts.get(i).getIdProduct()+"\n";
+                msg += "Match " +followUp +": "+bibliographicProducts.get(i).getNameProduct();
+                msg += "\nCode match " + followUp + ": "+bibliographicProducts.get(i).getIdProduct()+"\n";
                 followUp++;
             }
         }
@@ -455,18 +458,21 @@ public class ControllerLibrary{
      * @return The method is returning a String variable named "confirmation".
      */
     public String aggregateBookToReader(String idReader, String idBook){
+        String confirmation = "";
         if (searchNumberReader(idReader) == -1) {
-            return "That id doesn't match with a reader";
+            confirmation = "That id doesn't match with a reader";
         } else if(searchNumberBibliograpicProduct(idBook) == -1){
-            return "That id doesn't match with a product";
-        }else{
+            confirmation = "That id doesn't match with a book";
+        }else if(checkUserHaveAProduct(idReader, idBook)){
+            confirmation = "The user already has the book";
+        }
+        else{
             Reader reader = consultObjectReader(idReader);
             BibliographicProduct book = consultObjectProduct(idBook);
-            String confirmation = reader.addBook((Book)book);
+            confirmation = reader.addBook((Book)book);
             book.addAmountSales();
-            return confirmation;
         }
-        
+        return confirmation;
     }
 
     /**
@@ -479,17 +485,20 @@ public class ControllerLibrary{
      * @return The method is returning a String variable named "confirmation".
      */
     public String aggregateMagazineToReader(String idReader, String idMagazine){
+        String confirmation = "";
         if (searchNumberReader(idReader) == -1) {
-            return "That id doesn't match with a reader";
+            confirmation = "That id doesn't match with a reader";
         } else if(searchNumberBibliograpicProduct(idMagazine) == -1){
-            return "That id doesn't match with a product";
+            confirmation ="That id doesn't match with a magazine";
+        }else if(checkUserHaveAProduct(idReader, idMagazine)){
+            confirmation = "The user already has the book";
         }else{
             Reader reader = consultObjectReader(idReader);
             BibliographicProduct magazine = consultObjectProduct(idMagazine);
-            String confirmation = reader.addMagazine((Magazine)magazine);
+            confirmation = reader.addMagazine((Magazine)magazine);
             magazine.addAmountSales();
-            return confirmation;
         }
+        return confirmation;
     }
 
     /**
@@ -550,48 +559,72 @@ public class ControllerLibrary{
      * page being read, the name of the product being read, and options for the reader to navigate
      * through the pages. It may also include advertisements for certain products or services.
      */
-    public String readingSession(String idProduct, String idReader, String simulationOption){
+    public String 
+    
+    readingSession(String idProduct, String idReader, String simulationOption){
         String pageProduct = "";
         AdType ad;
         Reader reader = consultObjectReader(idReader);
         BibliographicProduct product = consultObjectProduct(idProduct);
 
-        if(simulationOption.equals("S")){
+        if(simulationOption.equalsIgnoreCase("S")){
             if(reader.getCurrentSessionPage() == product.getNumberPages()){
-                pageProduct += ("The book is on the last page");
+                pageProduct += ("------The book is on the last page------");
             }
             else{
                 reader.addAmountSessionPage();
             }
         }
         
-        else if(simulationOption.equals("A")){
-            if(reader.getCurrentSessionPage() == 0){
-                pageProduct += ("The book is on the page 0");
+        else if(simulationOption.equalsIgnoreCase("A")){
+            if(reader.getCurrentSessionPage() == 1){
+                pageProduct += ("-----The book is on the page 1-------");
             }
             else{
                 reader.decreaseAmountSessionPage(); 
             }
         }
 
-        if(reader instanceof Regular && ((reader.getLastSessionPage() % 20 == 0) || reader.getCurrentSessionPage() == 1)){
-            Random random = new Random();
-            int auxAdd = random.nextInt(3)+1;
-            if(auxAdd == 1){
-                ad = AdType.COMBO_PLUS;
-                pageProduct += ad + ": Subscribe to Combo Plus and get Disney+ and Star+ at an incredible price!";
-            }else if(auxAdd == 2){
-                ad = AdType.LAIKA;
-                pageProduct += ad +": Now your pets have a favorite app: Laika. The best products for your furry.";
+        if(reader instanceof Regular){
+            if(product instanceof Book){
+                if((reader.getCurrentSessionPage() % 20 == 0) || reader.getLastSessionPage() == 0){
+                    Random random = new Random();
+                    int auxAdd = random.nextInt(3)+1;
+                    if(auxAdd == 1){
+                        ad = AdType.COMBO_PLUS;
+                        pageProduct += ad + ": Subscribe to Combo Plus and get Disney+ and Star+ at an incredible price!";
+                    }else if(auxAdd == 2){
+                        ad = AdType.LAIKA;
+                        pageProduct += ad +": Now your pets have a favorite app: Laika. The best products for your furry.";
+                    }else{
+                        ad = AdType.EXITO;
+                        pageProduct += ad + ": We are celebrating our anniversary! Visit your nearest Éxito and be surprised with the best offers.";
+                    }
+                }
             }else{
-                ad = AdType.EXITO;
-                pageProduct += ad + ": We are celebrating our anniversary! Visit your nearest Éxito and be surprised with the best offers.";
+                if((reader.getCurrentSessionPage() % 5 == 0) || reader.getLastSessionPage() == 0){
+                    Random random = new Random();
+                    int auxAdd = random.nextInt(3)+1;
+                    if(auxAdd == 1){
+                        ad = AdType.COMBO_PLUS;
+                        pageProduct += ad + ": Subscribe to Combo Plus and get Disney+ and Star+ at an incredible price!";
+                    }else if(auxAdd == 2){
+                        ad = AdType.LAIKA;
+                        pageProduct += ad +": Now your pets have a favorite app: Laika. The best products for your furry.";
+                    }else{
+                        ad = AdType.EXITO;
+                        pageProduct += ad + ": We are celebrating our anniversary! Visit your nearest Éxito and be surprised with the best offers.";
+                    }
+                }
             }
+            
         }
+
+            
 
         pageProduct += ("\nReader sesion in progress \n Reading: " + product.getNameProduct() + "\n Reading page: " + reader.getCurrentSessionPage() + " of "+ product.getNumberPages()
         +"\n Type A for the previous page \n Type S for the next page\n Type B to back to the library");
-
+        
         return pageProduct;
 
     }
@@ -613,7 +646,7 @@ public class ControllerLibrary{
         Reader reader = consultObjectReader(idReader);
         String library = reader.getNameReader() + " library:\n";
         library += "   |   0   |   1   |   2   |   3   |   4\n"+column;
-        String[][] temp = libraryUser.get(matrixNumber);
+        String[][] temp = reader.getLibraryUser().get(matrixNumber);
         for (int i = 0; i < 5; i++) {
             for (int j = 0; j < 5; j++) {
                 library += "  |  "+temp[i][j] ;
@@ -623,14 +656,22 @@ public class ControllerLibrary{
                 library += "\n"+column;
             }
         }
-        library += "\nType the coordinate x,y (x for Row and y for Column example 2,5)  or the corresponding code of the bibliographic product to start a reading sesion\nType A to the next page\nType S to the previous page\nType E to the exit";
+        library += "\nType the coordinate x,y (x for Row and y for Column example 2,5)  or the corresponding code of the bibliographic product to start a reading session\nType A to the previous page\nType S to the next page\nType E to exit";
         return library;
     }
 
+    /**
+     * This function enters bibliographic products into a tensor library for a given user, with a
+     * maximum of 25 products per tensor.
+     * 
+     * @param idUser The parameter "idUser" is a String that represents the ID of the user whose
+     * bibliographic products are being entered into a tensor library.
+     */
     public void enterProductsToTensorLibrary(String idUser){
         Reader reader = consultObjectReader(idUser);
         ArrayList<BibliographicProduct>auxBibliographicProducts = reader.returnBibliographicProductsByDate();
         double max = Math.ceil((double) reader.returnBibliographicProductsByDate().size()/25);
+        reader.getLibraryUser().clear();
         int aux = 0;
         int contador = 0;
         do {
@@ -645,21 +686,51 @@ public class ControllerLibrary{
                     contador++;
                 }
             }
-            libraryUser.add(auxMatrix);
+            reader.getLibraryUser().add(auxMatrix);
             aux++;
         } while(aux < max);
         
     }
 
+    /**
+     * This function calculates the number of pages needed to display a list of bibliographic products
+     * borrowed by a reader, with a maximum of 25 products per page.
+     * 
+     * @param idReader The parameter "idReader" is a String variable that represents the unique
+     * identifier of a reader in a library system.
+     * @return The method `getNumberMatrixOfLibrary` is returning a `double` value which represents the
+     * number of matrices required to store all the bibliographic products borrowed by a reader
+     * identified by `idReader`. The calculation is based on the number of bibliographic products
+     * borrowed by the reader and assuming that each matrix can store up to 25 bibliographic products.
+     * The `Math.ceil` function is used to round
+     */
     public double getNumberMatrixOfLibrary(String idReader){
         Reader reader = consultObjectReader(idReader);
         return Math.ceil((double) reader.returnBibliographicProductsByDate().size()/25);
     }
     
-    public ArrayList<String[][]> getLibraryUser() {
-      return libraryUser;
+    /**
+     * This function returns an ArrayList of String arrays representing the library user information
+     * obtained from a Reader object.
+     * 
+     * @param reader The parameter "reader" is an object of the class "Reader". It is likely that this
+     * method is defined within a class that has a "Reader" object as an instance variable or is passed
+     * as a parameter to the method. The method returns an ArrayList of String arrays, which is
+     * obtained by calling
+     * @return An ArrayList of String arrays, where each String array represents a library user.
+     */
+    public ArrayList<String[][]> getLibraryUser(Reader reader) {
+      return reader.getLibraryUser();
     }
 
+    /**
+     * This function calculates and returns the amount of pages read in books and magazines.
+     * 
+     * @return The method `amountReadPagesByProductType()` returns a string that contains the amount of
+     * pages read in books and magazines. The string includes the message "Amount pages read in BOOKS:
+     * " followed by the total amount of pages read in books, and "Amount pages read in MAGAZINES: "
+     * followed by the total amount of pages read in magazines.
+     */
     public String amountReadPagesByProductType(){
         String bookMsg = "Amount pages read in BOOKS: ";
         String magazineMsg = "Amount pages read in MAGAZINES: ";
@@ -676,11 +747,17 @@ public class ControllerLibrary{
         return bookMsg + amountPagesReadBook + "\n" +magazineMsg + amountPagesReadMagazine;
     }
 
+    /**
+     * This function calculates and returns the most read gender and category of books and magazines in
+     * a library system.
+     * 
+     * @return The method is returning a String message that indicates the most read gender and
+     * category based on the amount of pages read for each bibliographic product in the
+     * bibliographicProducts list.
+     */
     public String genderAndCategoryMoreRead(){
         
         int pagesGenderSciencieFiction = 0,pagesGenderFantasy = 0,pagesGenderHistoricalNovel = 0,pagesCategoryVariety =0,pagesCategoryDesign = 0, pagesCategoryScientist = 0;
-        int mostReadGenderList[] = {pagesGenderSciencieFiction, pagesGenderFantasy, pagesGenderHistoricalNovel};
-        int mostReadCategoryList[] = {pagesCategoryVariety, pagesCategoryDesign, pagesCategoryScientist};
         for (BibliographicProduct bibliographicProduct : bibliographicProducts) {
             if(bibliographicProduct instanceof Book ){
                 switch(((Book)bibliographicProduct).getGender()){
@@ -703,38 +780,62 @@ public class ControllerLibrary{
                 }
             }
         }
-        int auxGender = mostReadGenderList[0];
-        int biggestGenderInt = 0;
-        int auxCategory = mostReadCategoryList[0];
-        int biggestCategoryInt = 0;
+        int mostReadGenderList[] = {pagesGenderSciencieFiction, pagesGenderFantasy, pagesGenderHistoricalNovel};
+        int mostReadCategoryList[] = {pagesCategoryVariety, pagesCategoryDesign, pagesCategoryScientist};
+        int auxGender = 0;
+        int biggestGenderInt = -1;
+        int auxCategory = 0;
+        int biggestCategoryInt = -1;
         String mostReadGender = "", mostReadCategory="";
+        String msg="";
+
         for (int i = 0; i < 3; i++) {
-            if(mostReadGenderList[i] > auxGender){
+            if(auxGender < mostReadGenderList[i]){
                 biggestGenderInt = i;
+                auxGender = mostReadGenderList[i];
             }
             if(mostReadCategoryList[i] > auxCategory){
                 biggestCategoryInt = i;
+                auxCategory = mostReadCategoryList[i];
             }
         }
-        if(biggestGenderInt == 1){
+        if(biggestGenderInt == 0){
             mostReadGender = "SCIENCIE_FICTION";
-        }else if(biggestGenderInt == 2){
+            msg += "The most read gender is: " + mostReadGender +" with " + mostReadGenderList[biggestGenderInt]+" pages\n";
+        }else if(biggestGenderInt == 1){
             mostReadGender = "FANTASY";
-        }else{
+            msg += "The most read gender is: " + mostReadGender +" with " + mostReadGenderList[biggestGenderInt]+" pages\n"; 
+        }else if(biggestGenderInt == 2){
             mostReadGender = "HISTORICAL_NOVEL";
-        }
-        if(biggestCategoryInt == 1){
-            mostReadCategory = "VARIETY";
-        }else if(biggestCategoryInt == 2){
-            mostReadCategory = "DESIGN";
+            msg += "The most read gender is: " + mostReadGender +" with " + mostReadGenderList[biggestGenderInt]+" pages\n"; 
         }else{
-            mostReadCategory = "SCIENTIST";
+            msg += "All the genders have 0 read pages"+"\n";
         }
-        
-        String msg = "The most read gender is: " + mostReadGender +" with " + mostReadGenderList[biggestGenderInt] + "\n The most read categoty is: " + mostReadCategory +" with " + mostReadCategoryList[biggestCategoryInt];
+
+
+        if(biggestCategoryInt == 0){
+            mostReadCategory = "VARIETY";
+            msg +=  " The most read categoty is: " + mostReadCategory +" with " + mostReadCategoryList[biggestCategoryInt]+" pages\n";
+        }else if(biggestCategoryInt == 1){
+            mostReadCategory = "DESIGN";
+            msg +=  " The most read categoty is: " + mostReadCategory +" with " + mostReadCategoryList[biggestCategoryInt]+" pages\n";
+        }else if(biggestCategoryInt == 2){
+            mostReadCategory = "SCIENTIST";
+            msg +=  " The most read categoty is: " + mostReadCategory +" with " + mostReadCategoryList[biggestCategoryInt]+" pages\n";
+        }else{
+            msg += "All the categories have 0 read pages";
+        }
+
         return msg;
     }
 
+    /**
+     * This function returns a string containing the top five most read books and magazines, sorted by
+     * the amount of pages read.
+     * 
+     * @return The method is returning a String message that contains the top five books and magazines
+     * most read, sorted by the amount of pages read.
+     */
     public String topFiveBooksAndMagazinesMostRead(){
         ArrayList<Book>books = new ArrayList<>();
         ArrayList<Magazine>magazines = new ArrayList<>();
@@ -745,12 +846,12 @@ public class ControllerLibrary{
                 magazines.add((Magazine)bibliographicProducts.get(i));
             }
         }
-        Collections.sort(books, Comparator.comparing(Book::getAmountPagesRead));
-        Collections.sort(magazines,Comparator.comparing(Magazine::getAmountPagesRead));
+        Collections.sort(books, Comparator.comparing(Book::getAmountPagesRead).reversed());
+        Collections.sort(magazines,Comparator.comparing(Magazine::getAmountPagesRead).reversed());
         String msg = "The top five books for pages read are:";
         for (int i = 0; i < 5; i++) {
-            if((books.size() > i)){
-                msg += "\n"+(i+1)+". Book name: "+books.get(i).getNameProduct() + ", Gender: " +books.get(i).getGender() + ", amount pages read: " + books.get(i).getAmountPagesRead();
+            if(books.size() > i){
+                msg += "\n"+(i+1)+". Book name: "+books.get(i).getNameProduct() + ", Gender: " + books.get(i).getGender() + ", amount pages read: " + books.get(i).getAmountPagesRead();
             }else{
                 msg += "\n"+(i+1)+". Empty place Book";
             }
@@ -766,45 +867,64 @@ public class ControllerLibrary{
         return msg;
     }
 
+    /**
+     * The function calculates the amount of books sold and their total sales value by gender and
+     * returns a formatted message.
+     * 
+     * @return The method is returning a String message that shows the amount of books sold and the
+     * total sales value for each gender category (SCIENCIE_FICTION, FANTASY, and HISTORICAL_NOVEL) in
+     * the bibliographicProducts list.
+     */
     public String amountSoldBooksAndValueByGender(){
         int amountGenderSciencieFiction = 0,amountGenderFantasy = 0,amountGenderHistoricalNovel = 0;
         double salesGenderSciencieFiction = 0,salesGenderFantasy = 0,salesGenderHistoricalNovel = 0;
-        for (BibliographicProduct bibliographicProduct : bibliographicProducts) {
-            if(bibliographicProduct instanceof Book ){
-                switch(((Book)bibliographicProduct).getGender()){
-                    case SCIENCIE_FICTION: amountGenderSciencieFiction++;
-                        salesGenderSciencieFiction += bibliographicProduct.getValueProduct();
-                        break;
-                    case FANTASY: amountGenderFantasy++;
-                        salesGenderFantasy += bibliographicProduct.getValueProduct();
-                        break;
-                    case HISTORICAL_NOVEL: amountGenderHistoricalNovel++;
-                        salesGenderHistoricalNovel += bibliographicProduct.getValueProduct();
-                        break;
+        for (Reader reader : readers) {
+            for (BibliographicProduct bibliographicProduct : bibliographicProducts) {
+                if(bibliographicProduct instanceof Book && reader.checkUserHaveAProduct(bibliographicProduct)){
+                    switch(((Book)bibliographicProduct).getGender()){
+                        case SCIENCIE_FICTION: amountGenderSciencieFiction++;
+                            salesGenderSciencieFiction += bibliographicProduct.getValueProduct();
+                            break;
+                        case FANTASY: amountGenderFantasy++;
+                            salesGenderFantasy += bibliographicProduct.getValueProduct();
+                            break;
+                        case HISTORICAL_NOVEL: amountGenderHistoricalNovel++;
+                            salesGenderHistoricalNovel += bibliographicProduct.getValueProduct();
+                            break;
+                    }
                 }
             }
         }
 
-        String msg = "Gender type:   Amount books sale:   Total sales value:\nGender type: SCIENCIE_FICTION, Amount books sale:"+ amountGenderSciencieFiction +", Total sales value:"+salesGenderSciencieFiction 
-        +"\nGender type: FANTASY, Amount books sale:"+ amountGenderFantasy +", Total sales value:"+salesGenderFantasy+"\nGender type: HISTORICAL_NOVEL, Amount books sale:"+ amountGenderHistoricalNovel +", Total sales value:"+salesGenderHistoricalNovel;
+        String msg = "Gender type:   Amount books sale:   Total sales value:\nGender type: SCIENCIE_FICTION, Amount books sale: "+ amountGenderSciencieFiction +", Total sales value: "+salesGenderSciencieFiction 
+        +"\nGender type: FANTASY, Amount books sale: "+ amountGenderFantasy +", Total sales value: "+salesGenderFantasy+"\nGender type: HISTORICAL_NOVEL, Amount books sale: "+ amountGenderHistoricalNovel +", Total sales value: "+salesGenderHistoricalNovel;
         return msg;
     }
 
+    /**
+     * The function calculates the amount of magazines sold and their total sales value by category and
+     * returns a formatted message.
+     * 
+     * @return The method is returning a String message that shows the amount of active subscription
+     * magazines and total sales value for each category of magazines (Variety, Design, and Scientist).
+     */
     public String amountSoldMagazinesAndValueByCategory(){
         int amountCategoryVariety =0,amountCategoryDesign = 0, amountCategoryScientist = 0;
         double salesCategoryVariety =0,salesCategoryDesign = 0, salesCategoryScientist = 0;
-        for (BibliographicProduct bibliographicProduct : bibliographicProducts) {
-            if(bibliographicProduct instanceof Magazine){
-                switch(((Magazine)bibliographicProduct).getCategory()){
-                    case VARIETY: amountCategoryVariety++;
-                        salesCategoryVariety += bibliographicProduct.getValueProduct();
-                        break;
-                    case DESIGN: amountCategoryDesign++;
-                        salesCategoryDesign += bibliographicProduct.getValueProduct();
-                        break;
-                    case SCIENTIST: amountCategoryScientist++;
-                        salesCategoryScientist += bibliographicProduct.getValueProduct();
-                        break;
+        for (Reader reader : readers) {
+            for (BibliographicProduct bibliographicProduct : bibliographicProducts) {
+                if(bibliographicProduct instanceof Magazine && reader.checkUserHaveAProduct(bibliographicProduct)){
+                    switch(((Magazine)bibliographicProduct).getCategory()){
+                        case VARIETY: amountCategoryVariety++;
+                            salesCategoryVariety += bibliographicProduct.getValueProduct();
+                            break;
+                        case DESIGN: amountCategoryDesign++;
+                            salesCategoryDesign += bibliographicProduct.getValueProduct();
+                            break;
+                        case SCIENTIST: amountCategoryScientist++;
+                            salesCategoryScientist += bibliographicProduct.getValueProduct();
+                            break;
+                    }
                 }
             }
         }
