@@ -469,8 +469,13 @@ public class ControllerLibrary{
         else{
             Reader reader = consultObjectReader(idReader);
             BibliographicProduct book = consultObjectProduct(idBook);
-            confirmation = reader.addBook((Book)book);
-            book.addAmountSales();
+            if(book instanceof Book){
+                confirmation = reader.addBook((Book)book);
+                book.addAmountSales(); 
+            }else{
+                confirmation = "The product is not a book";
+            }
+            
         }
         return confirmation;
     }
@@ -495,8 +500,12 @@ public class ControllerLibrary{
         }else{
             Reader reader = consultObjectReader(idReader);
             BibliographicProduct magazine = consultObjectProduct(idMagazine);
-            confirmation = reader.addMagazine((Magazine)magazine);
-            magazine.addAmountSales();
+            if(magazine instanceof Magazine){
+                confirmation = reader.addMagazine((Magazine)magazine);
+                magazine.addAmountSales(); 
+            }else{
+                confirmation = "The product is not a magazine";
+            }
         }
         return confirmation;
     }
